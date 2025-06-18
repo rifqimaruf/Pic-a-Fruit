@@ -1,0 +1,55 @@
+{
+  "expo": {
+    "name": "Pic a Fruit",
+    "slug": "pic-a-fruit",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "userInterfaceStyle": "light",
+    "splash": {
+      "image": "./assets/splash.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#4CAF50"
+    },
+    "assetBundlePatterns": [
+      "**/*"
+    ],
+    "ios": {
+      "supportsTablet": true,
+      "infoPlist": {
+        "NSCameraUsageDescription": "Aplikasi ini memerlukan akses kamera untuk scan buah dan mendeteksi kesegarannya",
+        "NSPhotoLibraryUsageDescription": "Aplikasi ini memerlukan akses galeri untuk memilih foto buah yang akan dianalisis"
+      }
+    },
+    "android": {
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/adaptive-icon.png",
+        "backgroundColor": "#4CAF50"
+      },
+      "permissions": [
+        "CAMERA",
+        "READ_EXTERNAL_STORAGE",
+        "WRITE_EXTERNAL_STORAGE",
+        "INTERNET"
+      ],
+      "package": "com.picafruit.app"
+    },
+    "web": {
+      "favicon": "./assets/favicon.png"
+    },
+    "plugins": [
+      [
+        "expo-camera",
+        {
+          "cameraPermission": "Izinkan $(PRODUCT_NAME) untuk mengakses kamera agar dapat scan buah."
+        }
+      ],
+      [
+        "expo-image-picker",
+        {
+          "photosPermission": "Aplikasi ini mengakses foto untuk memilih gambar buah yang akan dianalisis."
+        }
+      ]
+    ]
+  }
+}
