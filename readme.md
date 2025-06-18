@@ -11,7 +11,7 @@
 Open your terminal and run:
 
 ```bash
-git clone [https://github.com/your-username/your-project-repo.git](https://github.com/rifqimaruf/Pic-a-Fruit.git)
+git clone https://github.com/rifqimaruf/Pic-a-Fruit.git
 cd your-project-repo
 ```
 
