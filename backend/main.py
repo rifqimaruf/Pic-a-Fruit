@@ -51,7 +51,7 @@ def load_ai_model():
             from tensorflow.keras.models import load_model
             
             # Cek apakah file model ada
-            model_path = "./model/cnnVGG16rv2.h5"
+            model_path = "cnnVGG19v2.h5"
             if os.path.exists(model_path):
                 logger.info(">> Loading AI model...")
                 model = load_model(model_path)

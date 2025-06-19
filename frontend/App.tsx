@@ -52,7 +52,12 @@ const App: React.FC = () => {
             name="Splash" 
             component={SplashScreen}
             options={{
-              animationEnabled: false
+              gestureEnabled: false,
+              cardStyleInterpolator: ({ current }) => ({
+                cardStyle: {
+                  opacity: current.progress,
+                },
+              }),
             }}
           />
           

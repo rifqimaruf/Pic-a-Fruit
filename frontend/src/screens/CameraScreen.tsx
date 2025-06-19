@@ -1,5 +1,4 @@
-// src/screens/CameraScreen.tsx
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import {
   View,
   Text,
@@ -8,13 +7,14 @@ import {
   Alert,
   StatusBar,
   ActivityIndicator,
-  Dimensions,
+  Modal,
+  Pressable,
 } from 'react-native';
 import { StackNavigationProp } from '@react-navigation/stack';
-import { Camera, CameraType, FlashMode } from 'expo-camera';
+import { CameraView, useCameraPermissions } from 'expo-camera';
 import * as ImagePicker from 'expo-image-picker';
-import { ArrowLeft, Zap, ZapOff, Image as ImageIcon, RotateCcw } from 'lucide-react-native';
-import { RootStackParamList, ScanResult } from '../types';
+import { AntDesign, MaterialIcons } from '@expo/vector-icons';
+import { RootStackParamList } from '../types';
 import apiService from '../services/apiService';
 import storageService from '../utils/storage';
 
@@ -24,69 +24,36 @@ interface Props {
   navigation: CameraScreenNavigationProp;
 }
 
-const { width, height } = Dimensions.get('window');
-
 const CameraScreen: React.FC<Props> = ({ navigation }) => {
-  const [hasPermission, setHasPermission] = useState<boolean | null>(null);
-  const [cameraType, setCameraType] = useState(CameraType.back);
-  const [flashMode, setFlashMode] = useState(FlashMode.off);
+  const [permission, requestPermission] = useCameraPermissions();
   const [isLoading, setIsLoading] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
-  const cameraRef = useRef<Camera>(null);
+  const [showCamera, setShowCamera] = useState(false);
+  const [cameraType, setCameraType] = useState<'back' | 'front'>('back');
+  const cameraRef = useRef<CameraView>(null);
 
   useEffect(() => {
-    (async () => {
-      try {
-        // Request camera permissions
-        const { status } = await Camera.requestCameraPermissionsAsync();
-        setHasPermission(status === 'granted');
-        
-        if (status !== 'granted') {
-          Alert.alert(
-            'Izin Kamera Diperlukan',
-            'Aplikasi ini memerlukan akses kamera untuk scan buah. Silakan berikan izin di pengaturan.',
-            [
-              { text: 'Nanti', onPress: () => navigation.goBack() },
-              { text: 'Buka Pengaturan', onPress: () => {
-                // You can add logic to open app settings here
-                navigation.goBack();
-              }}
-            ]
-          );
-        }
-      } catch (error) {
-        console.error('Error requesting camera permission:', error);
-        setHasPermission(false);
-      }
-    })();
-  }, []);
+    if (permission && !permission.granted && permission.canAskAgain) {
+      requestPermission();
+    }
+  }, [permission]);
 
   const takePicture = async () => {
-    if (!cameraRef.current || isLoading || isProcessing) {
-      return;
-    }
+    if (!cameraRef.current || isLoading || isProcessing) return;
 
     try {
       setIsLoading(true);
-      
-      console.log('📷 Taking picture...');
       const photo = await cameraRef.current.takePictureAsync({
-        quality: 0.8,
+        quality: 1,
         base64: false,
         skipProcessing: false,
       });
 
-      console.log('✅ Picture taken:', photo.uri);
-      
-      // Navigate to processing screen
       navigation.navigate('Processing');
       setIsProcessing(true);
-      
-      // Process the image
       await processImage(photo.uri);
-      
     } catch (error) {
-      console.error('❌ Error taking picture:', error);
+      console.error('Error taking picture:', error);
       Alert.alert('Error', 'Gagal mengambil foto. Silakan coba lagi.');
     } finally {
       setIsLoading(false);
@@ -95,217 +62,145 @@ const CameraScreen: React.FC<Props> = ({ navigation }) => {
 
   const pickImage = async () => {
     try {
-      console.log('📁 Opening image picker...');
-      
-      // Request media library permissions
-      const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
-      if (status !== 'granted') {
-        Alert.alert(
-          'Izin Galeri Diperlukan',
-          'Aplikasi memerlukan akses galeri untuk memilih foto buah.'
-        );
-        return;
-      }
-
       const result = await ImagePicker.launchImageLibraryAsync({
         mediaTypes: ImagePicker.MediaTypeOptions.Images,
         allowsEditing: true,
-        aspect: [1, 1],
-        quality: 0.8,
+        aspect: [4, 3],
+        quality: 1,
       });
 
-      if (!result.canceled && result.assets[0]) {
-        console.log('✅ Image selected:', result.assets[0].uri);
-        
-        setIsLoading(true);
+      if (!result.canceled) {
         navigation.navigate('Processing');
         setIsProcessing(true);
-        
         await processImage(result.assets[0].uri);
       }
     } catch (error) {
-      console.error('❌ Error picking image:', error);
-      Alert.alert('Error', 'Gagal memilih gambar dari galeri.');
+      console.error('Error picking image:', error);
+      Alert.alert('Error', 'Gagal memilih gambar. Silakan coba lagi.');
     }
   };
 
-  const processImage = async (imageUri: string) => {
+  const processImage = async (uri: string) => {
     try {
-      console.log('🔄 Processing image:', imageUri);
-      
-      // Call API service
-      const result = await apiService.predictFruit(imageUri);
-      console.log('✅ Prediction result:', result);
-      
-      // Save to storage
+      const result = await apiService.predictFruit(uri);
       await storageService.saveScanResult(result);
-      
-      // Navigate to result screen
       navigation.replace('Result', { scanResult: result });
-      
     } catch (error: any) {
-      console.error('❌ Processing error:', error);
-      
-      // Navigate back to camera and show error
+      Alert.alert('Gagal memproses gambar', error.message || 'Periksa koneksi atau server.');
       navigation.goBack();
-      
-      Alert.alert(
-        'Error Pemrosesan',
-        error.message || 'Gagal memproses gambar. Pastikan server AI berjalan dan koneksi internet tersedia.',
-        [
-          { text: 'Coba Lagi', onPress: () => {} },
-          { text: 'Kembali', onPress: () => navigation.goBack() }
-        ]
-      );
     } finally {
       setIsLoading(false);
       setIsProcessing(false);
     }
   };
 
-  const toggleFlash = () => {
-    setFlashMode(flashMode === FlashMode.off ? FlashMode.on : FlashMode.off);
+  const toggleFacing = () => {
+    setCameraType(current => (current === 'back' ? 'front' : 'back'));
   };
 
-  const flipCamera = () => {
-    setCameraType(cameraType === CameraType.back ? CameraType.front : CameraType.back);
-  };
-
-  if (hasPermission === null) {
+  if (!permission) {
     return (
       <View style={styles.permissionContainer}>
         <ActivityIndicator size="large" color="#4CAF50" />
-        <Text style={styles.permissionText}>Meminta izin kamera...</Text>
+        <Text style={styles.permissionText}>Memeriksa izin kamera...</Text>
       </View>
     );
   }
 
-  if (hasPermission === false) {
+  if (!permission.granted) {
     return (
       <View style={styles.permissionContainer}>
         <Text style={styles.noPermissionIcon}>📷</Text>
         <Text style={styles.noPermissionTitle}>Akses Kamera Diperlukan</Text>
         <Text style={styles.noPermissionText}>
-          Aplikasi ini memerlukan akses kamera untuk scan buah dan mendeteksi tingkat kesegarannya.
+          Aplikasi ini memerlukan akses kamera untuk scan buah.
         </Text>
         <TouchableOpacity 
           style={styles.permissionButton}
-          onPress={() => Camera.requestCameraPermissionsAsync()}
+          onPress={requestPermission}
         >
           <Text style={styles.permissionButtonText}>Berikan Izin Kamera</Text>
-        </TouchableOpacity>
-        <TouchableOpacity 
-          style={styles.backToHomeButton}
-          onPress={() => navigation.goBack()}
-        >
-          <Text style={styles.backToHomeText}>Kembali</Text>
         </TouchableOpacity>
       </View>
     );
   }
 
-  return (
-    <View style={styles.container}>
-      <StatusBar barStyle="light-content" backgroundColor="#000" />
-      
-      <Camera 
-        style={styles.camera} 
-        type={cameraType} 
-        flashMode={flashMode}
-        ref={cameraRef}
-      >
-        {/* Overlay Frame */}
-        <View style={styles.overlay}>
-          <View style={styles.focusFrame}>
-            <View style={styles.frameCorners}>
-              <View style={[styles.corner, styles.topLeft]} />
-              <View style={[styles.corner, styles.topRight]} />
-              <View style={[styles.corner, styles.bottomLeft]} />
-              <View style={[styles.corner, styles.bottomRight]} />
-            </View>
-            <Text style={styles.focusText}>
-              Posisikan buah di dalam area ini
-            </Text>
+  if (showCamera) {
+    return (
+      <View style={styles.container}>
+        <StatusBar barStyle="light-content" backgroundColor="#000" />
+        
+        <CameraView 
+          style={styles.camera} 
+          facing={cameraType}
+          ref={cameraRef}
+        >
+          <View style={styles.buttonRow}>
+            <TouchableOpacity style={styles.button} onPress={toggleFacing}>
+              <AntDesign name="retweet" size={28} color="white" />
+            </TouchableOpacity>
+            
+            <TouchableOpacity 
+              style={styles.scanButton} 
+              onPress={takePicture}
+              disabled={isLoading || isProcessing}
+            >
+              {isLoading ? (
+                <ActivityIndicator size="small" color="white" />
+              ) : (
+                <AntDesign name="camera" size={28} color="white" />
+              )}
+            </TouchableOpacity>
+            
+            <TouchableOpacity 
+              style={styles.button} 
+              onPress={() => setShowCamera(false)}
+            >
+              <AntDesign name="close" size={28} color="white" />
+            </TouchableOpacity>
           </View>
-        </View>
-      </Camera>
-
-      {/* Top Controls */}
-      <View style={styles.topControls}>
-        <TouchableOpacity 
-          style={styles.topButton}
-          onPress={() => navigation.goBack()}
-        >
-          <ArrowLeft size={24} color="#fff" />
-        </TouchableOpacity>
-        
-        <Text style={styles.title}>Scan Buah</Text>
-        
-        <TouchableOpacity 
-          style={styles.topButton}
-          onPress={toggleFlash}
-        >
-          {flashMode === FlashMode.on ? (
-            <Zap size={24} color="#FFD700" />
-          ) : (
-            <ZapOff size={24} color="#fff" />
-          )}
-        </TouchableOpacity>
+        </CameraView>
       </View>
+    );
+  }
 
-      {/* Bottom Controls */}
-      <View style={styles.bottomControls}>
-        {/* Gallery Button */}
+  return (
+    <View style={styles.selectionContainer}>
+      <StatusBar barStyle="dark-content" backgroundColor="#fff" />
+      
+      <Text style={styles.selectionTitle}>Scan Buah</Text>
+      <Text style={styles.selectionSubtitle}>Pilih metode untuk memindai buah</Text>
+      
+      <View style={styles.selectionOptions}>
         <TouchableOpacity 
-          style={styles.sideButton}
-          onPress={pickImage}
-          disabled={isLoading}
-        >
-          <ImageIcon size={24} color="#fff" />
-          <Text style={styles.sideButtonText}>Galeri</Text>
-        </TouchableOpacity>
-
-        {/* Shutter Button */}
-        <TouchableOpacity 
-          style={[
-            styles.shutterButton, 
-            (isLoading || isProcessing) && styles.shutterDisabled
-          ]}
-          onPress={takePicture}
+          style={styles.optionButton}
+          onPress={() => setShowCamera(true)}
           disabled={isLoading || isProcessing}
         >
-          {isLoading ? (
-            <ActivityIndicator size="large" color="#4CAF50" />
-          ) : (
-            <View style={styles.shutterInner} />
-          )}
+          <View style={styles.optionIconContainer}>
+            <MaterialIcons name="photo-camera" size={32} color="#4CAF50" />
+          </View>
+          <Text style={styles.optionText}>Ambil Foto</Text>
         </TouchableOpacity>
-
-        {/* Flip Camera Button */}
+        
         <TouchableOpacity 
-          style={styles.sideButton}
-          onPress={flipCamera}
-          disabled={isLoading}
+          style={styles.optionButton}
+          onPress={pickImage}
+          disabled={isLoading || isProcessing}
         >
-          <RotateCcw size={24} color="#fff" />
-          <Text style={styles.sideButtonText}>Putar</Text>
+          <View style={styles.optionIconContainer}>
+            <MaterialIcons name="photo-library" size={32} color="#4CAF50" />
+          </View>
+          <Text style={styles.optionText}>Pilih dari Galeri</Text>
         </TouchableOpacity>
       </View>
-
-      {/* Instructions */}
-      <View style={styles.instructions}>
-        <Text style={styles.instructionText}>
-          💡 Pastikan pencahayaan cukup dan buah terlihat jelas
-        </Text>
-      </View>
-
-      {/* Loading Overlay */}
-      {isProcessing && (
-        <View style={styles.loadingOverlay}>
-          <ActivityIndicator size="large" color="#4CAF50" />
-          <Text style={styles.loadingText}>Memproses gambar...</Text>
-        </View>
-      )}
+      
+      <TouchableOpacity 
+        style={styles.cancelButton}
+        onPress={() => navigation.goBack()}
+      >
+        <Text style={styles.cancelButtonText}>Batal</Text>
+      </TouchableOpacity>
     </View>
   );
 };
@@ -315,154 +210,37 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#000',
   },
+  selectionContainer: {
+    flex: 1,
+    backgroundColor: '#fff',
+    padding: 20,
+    justifyContent: 'center',
+  },
   camera: {
     flex: 1,
   },
-  overlay: {
-    position: 'absolute',
-    top: 0,
-    left: 0,
-    right: 0,
-    bottom: 0,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  focusFrame: {
-    width: 280,
-    height: 280,
-    justifyContent: 'center',
-    alignItems: 'center',
-    position: 'relative',
-  },
-  frameCorners: {
-    position: 'absolute',
-    width: '100%',
-    height: '100%',
-  },
-  corner: {
-    position: 'absolute',
-    width: 30,
-    height: 30,
-    borderColor: '#4CAF50',
-    borderWidth: 3,
-  },
-  topLeft: {
-    top: 0,
-    left: 0,
-    borderRightWidth: 0,
-    borderBottomWidth: 0,
-  },
-  topRight: {
-    top: 0,
-    right: 0,
-    borderLeftWidth: 0,
-    borderBottomWidth: 0,
-  },
-  bottomLeft: {
-    bottom: 0,
-    left: 0,
-    borderRightWidth: 0,
-    borderTopWidth: 0,
-  },
-  bottomRight: {
-    bottom: 0,
-    right: 0,
-    borderLeftWidth: 0,
-    borderTopWidth: 0,
-  },
-  focusText: {
-    color: '#fff',
-    textAlign: 'center',
-    backgroundColor: 'rgba(0,0,0,0.7)',
-    padding: 12,
-    borderRadius: 8,
-    fontSize: 14,
-    maxWidth: 220,
-    fontWeight: '500',
-  },
-  topControls: {
-    position: 'absolute',
-    top: 50,
-    left: 0,
-    right: 0,
+  buttonRow: {
+    flex: 1,
     flexDirection: 'row',
+    margin: 64,
+    alignItems: 'flex-end',
     justifyContent: 'space-between',
-    alignItems: 'center',
-    paddingHorizontal: 20,
-    zIndex: 1,
   },
-  topButton: {
-    width: 44,
-    height: 44,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: 'rgba(0,0,0,0.3)',
-    borderRadius: 22,
-  },
-  title: {
-    color: '#fff',
-    fontSize: 18,
-    fontWeight: 'bold',
-  },
-  bottomControls: {
-    position: 'absolute',
-    bottom: 100,
-    left: 0,
-    right: 0,
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    paddingHorizontal: 40,
-    zIndex: 1,
-  },
-  sideButton: {
-    alignItems: 'center',
-    backgroundColor: 'rgba(0,0,0,0.3)',
-    paddingVertical: 8,
-    paddingHorizontal: 12,
-    borderRadius: 20,
-    minWidth: 60,
-  },
-  sideButtonText: {
-    color: '#fff',
-    fontSize: 12,
-    marginTop: 4,
-    fontWeight: '500',
-  },
-  shutterButton: {
-    width: 80,
-    height: 80,
-    borderRadius: 40,
-    backgroundColor: '#fff',
-    justifyContent: 'center',
-    alignItems: 'center',
-    borderWidth: 4,
-    borderColor: '#ddd',
-  },
-  shutterDisabled: {
-    opacity: 0.5,
-  },
-  shutterInner: {
-    width: 60,
-    height: 60,
-    borderRadius: 30,
-    backgroundColor: '#4CAF50',
-  },
-  instructions: {
-    position: 'absolute',
-    bottom: 40,
-    left: 20,
-    right: 20,
-    zIndex: 1,
-  },
-  instructionText: {
-    color: '#fff',
-    textAlign: 'center',
-    fontSize: 12,
+  button: {
     backgroundColor: 'rgba(0,0,0,0.6)',
-    padding: 10,
-    borderRadius: 8,
-    fontWeight: '500',
+    borderRadius: 50,
+    width: 50,
+    height: 50,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  scanButton: {
+    backgroundColor: '#4CAF50',
+    borderRadius: 50,
+    width: 50,
+    height: 50,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   permissionContainer: {
     flex: 1,
@@ -509,31 +287,54 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     fontSize: 16,
   },
-  backToHomeButton: {
-    paddingHorizontal: 24,
-    paddingVertical: 12,
+  // Selection screen styles
+  selectionTitle: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    color: '#333',
+    textAlign: 'center',
+    marginBottom: 8,
   },
-  backToHomeText: {
+  selectionSubtitle: {
+    fontSize: 16,
+    color: '#666',
+    textAlign: 'center',
+    marginBottom: 40,
+  },
+  selectionOptions: {
+    flexDirection: 'row',
+    justifyContent: 'space-around',
+    marginBottom: 40,
+  },
+  optionButton: {
+    alignItems: 'center',
+    width: '40%',
+  },
+  optionIconContainer: {
+    backgroundColor: '#f0f9f0',
+    width: 80,
+    height: 80,
+    borderRadius: 40,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginBottom: 12,
+  },
+  optionText: {
+    fontSize: 16,
+    color: '#333',
+    textAlign: 'center',
+  },
+  cancelButton: {
+    alignSelf: 'center',
+    padding: 12,
+    borderRadius: 8,
+    backgroundColor: '#f5f5f5',
+    width: '80%',
+  },
+  cancelButtonText: {
     color: '#666',
     textAlign: 'center',
     fontSize: 16,
-  },
-  loadingOverlay: {
-    position: 'absolute',
-    top: 0,
-    left: 0,
-    right: 0,
-    bottom: 0,
-    backgroundColor: 'rgba(0,0,0,0.7)',
-    justifyContent: 'center',
-    alignItems: 'center',
-    zIndex: 999,
-  },
-  loadingText: {
-    color: '#fff',
-    marginTop: 16,
-    fontSize: 16,
-    fontWeight: '500',
   },
 });
 

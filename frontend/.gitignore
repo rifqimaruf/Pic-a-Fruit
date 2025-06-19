@@ -34,3 +34,8 @@ yarn-error.*
 
 # typescript
 *.tsbuildinfo
+
+/android
+*.h5
+frontend/package-lock.json
+/package-lock.json

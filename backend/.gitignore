@@ -1,6 +1,26 @@
+# Virtual environment
 venv/
+
+# Python bytecode
 __pycache__/
-model/
 *.pyc
 *.pyo
 *.pyd
+
+# Model file
+/cnnVGG19v2.h5
+
+# Model folder (jika menyimpan hasil pelatihan)
+model/
+
+# Node.js dependencies
+/node_modules/
+
+# Lock file
+/package.lock.json
+
+# Android build files
+/android/
+
+# Expo generated files
+/.expo/

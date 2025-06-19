@@ -12,9 +12,9 @@ class ApiConfig {
     // Untuk iOS Simulator  
     IOS_SIMULATOR: 'http://localhost:8000',
     // Untuk device fisik (ganti dengan IP komputer Anda)
-    PHYSICAL_DEVICE: 'http://10.8.76.122:8000', // Sesuaikan IP ini!
+    PHYSICAL_DEVICE: 'http://192.168.100.5:8000', // Sesuaikan IP ini!
     // Untuk development di komputer yang sama
-    LOCAL: 'http://10.8.76.122'
+    LOCAL: 'http://192.168.100.5'
   };
 
   static getBaseUrl(): string {
