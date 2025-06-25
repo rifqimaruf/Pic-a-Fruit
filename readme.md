@@ -1,7 +1,7 @@
 
-# 🍓 Pic a Fruit
+# 🍓 Fruit Lens
 
-**Pic a Fruit** is a cross-platform mobile application built with **React Native** that uses **Deep Learning** to detect the ripeness level of fruits from images. This project consists of two main components, **Frontend: React Native + Expo**, **Backend: FastAPI + Deep Learning Model**
+**Fruit Lens** is a cross-platform mobile application built with **React Native** that uses **Deep Learning** to detect the ripeness level of fruits from images. This project consists of two main components, **Frontend: React Native + Expo**, **Backend: FastAPI + Deep Learning Model**
 
 
 ## 🛠️ Installation & Setup
@@ -60,10 +60,10 @@ project-root/
 
 ## 📱Application Interface Overview
 
-Here are the screenshots of the main pages in Pic a Fruit, an Android-based application for detecting the ripeness level of fruits.
+Here are the screenshots of the main pages in Fruit Lens, an Android-based application for detecting the ripeness level of fruits.
 
 ### 1. 🏠 Dashboard Screen
-The Dashboard Screen  serves as the main hub of the Pic a Fruit application. From here, users can:
+The Dashboard Screen  serves as the main hub of the Fruit Lens application. From here, users can:
 
 - View a welcome message and connection status to the AI server
 
@@ -82,7 +82,7 @@ The Dashboard Screen  serves as the main hub of the Pic a Fruit application. Fro
 
 
 ### 2. 🍎 Scan Fruit Screen
-On this screen, users are prompted to choose a method to scan a fruit. Pic a Fruit provides two scanning options:
+On this screen, users are prompted to choose a method to scan a fruit. Fruit Lens provides two scanning options:
 
 - Take a Photo – Open the camera and capture an image of the fruit directly.
 
