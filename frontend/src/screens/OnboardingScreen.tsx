@@ -28,7 +28,7 @@ const OnboardingScreen: React.FC<Props> = ({ navigation }) => {
 
   const onboardingData: OnboardingSlide[] = [
     {
-      title: "Selamat Datang di Pic a Fruit!",
+      title: "Selamat Datang di Fruit Lens",
       description: "Aplikasi pintar untuk mengecek kesegaran buah dengan teknologi AI yang canggih",
       icon: "🎉"
     },

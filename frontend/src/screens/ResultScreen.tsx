@@ -104,7 +104,7 @@ const ResultScreen: React.FC<Props> = ({ navigation, route }) => {
 
   const handleShare = async () => {
     try {
-      const message = `Hasil scan buah menggunakan Pic a Fruit:\n\n🍎 ${scanResult.fruit}\n📊 Status: ${scanResult.result}\n🎯 Tingkat keyakinan: ${scanResult.confidence}%\n📅 ${scanResult.date}\n\nDownload Pic a Fruit untuk scan buah Anda!`;
+      const message = `Hasil scan buah menggunakan Fruit Lens:\n\n🍎 ${scanResult.fruit}\n📊 Status: ${scanResult.result}\n🎯 Tingkat keyakinan: ${scanResult.confidence}%\n📅 ${scanResult.date}\n\nDownload Fruit Lens untuk scan buah Anda!`;
       
       await Share.share({
         message,

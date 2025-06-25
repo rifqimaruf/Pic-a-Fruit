@@ -72,7 +72,7 @@ const SplashScreen: React.FC<Props> = ({ navigation }) => {
         ]}
       >
         <Text style={styles.logo}>🥝</Text>
-        <Text style={styles.title}>Pic a Fruit</Text>
+        <Text style={styles.title}>Fruit Lens</Text>
         <Text style={styles.subtitle}>Kesegaran dalam Genggaman</Text>
         
         <View style={styles.loadingContainer}>

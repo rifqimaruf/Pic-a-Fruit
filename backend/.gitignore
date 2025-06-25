@@ -1,26 +1,28 @@
-# Virtual environment
+# === Python ===
 venv/
-
-# Python bytecode
 __pycache__/
-*.pyc
-*.pyo
-*.pyd
-
-# Model file
-/cnnVGG19v2.h5
-
-# Model folder (jika menyimpan hasil pelatihan)
+*.py[cod]
+*.so
+*.h5
+*.hdf5
 model/
 
-# Node.js dependencies
-/node_modules/
+# === Node.js / React Native ===
+node_modules/
+.expo/
+.expo-shared/
+android/
+ios/
+*.log
 
-# Lock file
-/package.lock.json
+# === Lock file (keep only if using yarn)
+# package-lock.json
 
-# Android build files
-/android/
+# === Environment and config ===
+.env
+.vscode/
+.DS_Store
 
-# Expo generated files
-/.expo/
+# === Build Artifacts ===
+*.apk
+*.aab

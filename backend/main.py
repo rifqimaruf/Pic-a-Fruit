@@ -16,7 +16,7 @@ logger = logging.getLogger(__name__)
 
 # Inisialisasi FastAPI
 app = FastAPI(
-    title="Pic a Fruit API",
+    title="Fruit Lens API",
     description="AI-powered fruit freshness detection API",
     version="1.0.0"
 )
@@ -111,14 +111,14 @@ def simulate_prediction() -> dict:
 @app.on_event("startup")
 async def startup_event():
     """Event yang dijalankan saat startup"""
-    logger.info(">> Starting Pic a Fruit API...")
+    logger.info(">> Starting Fruit Lens API...")
     load_ai_model()
 
 @app.get("/")
 async def root():
     """Health check endpoint"""
     return {
-        "message": "Pic a Fruit API is running!",
+        "message": "Fruit Lens API is running!",
         "status": "healthy",
         "model_loaded": model is not None,
         "version": "1.0.0"
@@ -168,7 +168,7 @@ async def predict_fruit(file: UploadFile = File(...)):
                 confidence = float(np.max(predictions[0]))
                 
                 # Validasi confidence threshold
-                if confidence < 0.6:  # 
+                if confidence < 0.7:  # 
                     return JSONResponse({
                         "status": "error",
                         "label": "Confidence terlalu rendah",

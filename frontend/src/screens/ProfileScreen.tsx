@@ -146,7 +146,7 @@ const ProfileScreen: React.FC<Props> = ({ navigation }) => {
   const handleRateApp = () => {
     Alert.alert(
       'Rating Aplikasi',
-      'Terima kasih telah menggunakan Pic a Fruit! Berikan rating di app store untuk membantu pengembangan aplikasi.',
+      'Terima kasih telah menggunakan Fruit Lens! Berikan rating di app store untuk membantu pengembangan aplikasi.',
       [
         { text: 'Nanti' },
         { text: 'Beri Rating', onPress: () => {
@@ -167,8 +167,8 @@ const ProfileScreen: React.FC<Props> = ({ navigation }) => {
 
   const handleAbout = () => {
     Alert.alert(
-      'Tentang Pic a Fruit',
-      'Pic a Fruit v1.0.0\n\nAplikasi AI untuk mendeteksi tingkat kematangan buah menggunakan teknologi computer vision.\n\nDikembangkan dengan ❤️ menggunakan React Native dan FastAPI.',
+      'Tentang Fruit Lens',
+      'Fruit Lens v1.0.0\n\nAplikasi AI untuk mendeteksi tingkat kematangan buah menggunakan teknologi computer vision.\n\nDikembangkan dengan ❤️ menggunakan React Native dan FastAPI.',
       [{ text: 'OK' }]
     );
   };
@@ -176,11 +176,11 @@ const ProfileScreen: React.FC<Props> = ({ navigation }) => {
   const handleContact = () => {
     Alert.alert(
       'Kontak Pengembang',
-      'Punya saran atau menemukan bug?\n\nHubungi kami di:\n📧 support@picafruit.com\n🐛 github.com/picafruit/issues',
+      'Punya saran atau menemukan bug?\n\nHubungi kami di:\n📧 support@fruitlens.com\n🐛 github.com/rifqimaruf/Pic-a-Fruit/issues',
       [
         { text: 'Batal' },
         { text: 'Buka Email', onPress: () => {
-          Linking.openURL('mailto:support@picafruit.com?subject=Pic a Fruit Feedback');
+          Linking.openURL('mailto:support@fruitlens.com?subject=Fruit Lens Feedback');
         }}
       ]
     );
@@ -332,8 +332,8 @@ const ProfileScreen: React.FC<Props> = ({ navigation }) => {
           </View>
           
           <View style={styles.userInfo}>
-            <Text style={styles.userName}>Pengguna Pic a Fruit</Text>
-            <Text style={styles.userEmail}>user@picafruit.com</Text>
+            <Text style={styles.userName}>Pengguna Fruit Lens</Text>
+            <Text style={styles.userEmail}>user@fruitlens.com</Text>
           </View>
         </View>
 
@@ -367,7 +367,7 @@ const ProfileScreen: React.FC<Props> = ({ navigation }) => {
         {/* Footer */}
         <View style={styles.footer}>
           <Text style={styles.footerText}>
-            Pic a Fruit v1.0.0{'\n'}
+            Fruit Lens v1.0.0{'\n'}
             Dibuat dengan ❤️ untuk petani dan pecinta buah
           </Text>
         </View>

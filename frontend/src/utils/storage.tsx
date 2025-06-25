@@ -4,9 +4,9 @@ import { ScanResult, StorageData } from '../types';
 
 class StorageService {
   private static readonly KEYS = {
-    SCAN_HISTORY: 'pic_a_fruit_scan_history',
-    IS_FIRST_TIME: 'pic_a_fruit_is_first_time',
-    SETTINGS: 'pic_a_fruit_settings',
+    SCAN_HISTORY: 'fruit_lens_scan_history',
+    IS_FIRST_TIME: 'fruit_lens_is_first_time',
+    SETTINGS: 'fruit_lens_settings',
   };
 
   /**
@@ -152,7 +152,7 @@ class StorageService {
   async getStorageInfo(): Promise<{ keys: string[]; size: number }> {
     try {
       const allKeys = await AsyncStorage.getAllKeys();
-      const appKeys = allKeys.filter(key => key.startsWith('pic_a_fruit_'));
+      const appKeys = allKeys.filter(key => key.startsWith('fruit_lens'));
       
       let totalSize = 0;
       for (const key of appKeys) {

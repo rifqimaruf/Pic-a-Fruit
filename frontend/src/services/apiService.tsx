@@ -8,7 +8,7 @@ class ApiConfig {
   // PENTING: Ganti IP sesuai dengan setup Anda
   private static readonly ENDPOINTS = {
     // Untuk Android Emulator
-    ANDROID_EMULATOR: 'http://10.8.76.122:8000',
+    ANDROID_EMULATOR: 'http://192.168.100.5:8000',
     // Untuk iOS Simulator  
     IOS_SIMULATOR: 'http://localhost:8000',
     // Untuk device fisik (ganti dengan IP komputer Anda)
