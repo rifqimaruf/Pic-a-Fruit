@@ -147,5 +147,5 @@ The Profile Screen provides users with access to account-related information, pe
 
 
 <p align="center">
-  <img src="https://github.com/user-attachments/assets/18882275-2287-49af-b10a-d22364fd9cfb" width="200" alt="dashboard" />
+  <img src="https://github.com/user-attachments/assets/dae79e7d-4033-49ba-9dbd-15d3b36b99c0" width="200" alt="dashboard" />
 </p>
