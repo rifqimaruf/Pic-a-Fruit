@@ -1,7 +1,7 @@
 
 # 🍓 Fruit Lens
 
-**Fruit Lens** is a cross-platform mobile application built with **React Native** that uses **Deep Learning** to detect the ripeness level of fruits from images. This project consists of two main components, **Frontend: React Native + Expo**, **Backend: FastAPI + Deep Learning Model**
+**Fruit Lens** is a cross-platform mobile application built with React Native that uses Deep Learning to detect the ripeness level of fruits from images. This project consists of two main components, Frontend: React Native + Expo, Backend: FastAPI + Deep Learning Model
 
 
 ## 🛠️ Installation & Setup
